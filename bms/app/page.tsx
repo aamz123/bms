@@ -1,5 +1,3 @@
-import Image from "next/image";
-import BatteryIndicator from "./components/batteryindicator";
 import VehicleView from "./components/VehicleView";
 
 export default function Home() {
@@ -8,8 +6,9 @@ export default function Home() {
       <h1 className="text-2xl text-center h-[30px]">
         Battery Management System - Team 4
       </h1>
-      <VehicleView />{" "}
+      <div>
+        <VehicleView />
+      </div>
     </div>
-    //return <div > <BatteryIndicator /></div>;
   );
 }

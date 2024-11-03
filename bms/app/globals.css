@@ -16,14 +16,15 @@ body {
   align-items: center;
   height: calc(100vh - 30px);
   background-color: #f0f0f0;
-  padding: 10%;
+  padding-top: 10%;
+  padding-bottom: 10%;
   z-index: -10;
 }
 
 /* Main vehicle body */
 .vehicle-body {
   position: relative;
-  width: 90%;
+  width: 80%;
   height: 100%;
   background-color: #cccccc;
   border-radius: 50px;
@@ -61,9 +62,56 @@ body {
 
 /* Center section (battery) */
 .battery {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: #b0b0b0;
-  height: 100%;
+  padding: 10px; /* Adds padding around the grid */
   flex: 0.44; /* Set width for 40% */
+  position: relative;
+}
+/* Cross lines for dividing into 4 sections */
+.battery::before,
+.battery::after {
+  content: "";
+  position: absolute;
+  background-color: #333; /* Color for the cross lines */
+  z-index: 5; /* Ensures it’s on top of the cells */
+}
+
+/* Horizontal line */
+.battery::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px; /* Adjust thickness of the line */
+  transform: translateY(-50%);
+}
+
+/* Vertical line */
+.battery::after {
+  left: 50%;
+  top: 0;
+  width: 2px; /* Adjust thickness of the line */
+  height: 100%;
+  transform: translateX(-50%);
+}
+.battery .grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr); /* Adjust columns as needed */
+  margin-top: 3px;
+  column-gap: 5px;
+  row-gap: 7px; /* Space between batteries */
+  max-width: 90%; /* Ensures it fits within the battery section */
+  max-height: 90%; /* Ensures it doesn’t overflow */
+}
+
+/* Battery Icon Wrapper */
+.battery-icon_wrapper {
+  width: 34px; /* Adjust to scale down */
+  height: 30px; /* Adjust height */
+  border-radius: 4px;
+  border: 2px solid #333;
 }
 
 /* Right section (baggage) */
