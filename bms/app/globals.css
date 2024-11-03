@@ -245,3 +245,9 @@ body {
   bottom: 0px; /* Adjust to sit flush with the corner */
   right: 0px;
 }
+.inputsection {
+  justify-content: center;
+  align-items: center;
+  width: 25%;
+
+}

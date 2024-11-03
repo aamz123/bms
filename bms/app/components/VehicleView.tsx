@@ -7,13 +7,9 @@ export default function VehicleView() {
   const toggleLights = (): void => {
     setLightsOn(!lightsOn);
   };
-  const [distance, setDistance] = useState(""); // State to hold distance input
+
   const [leftTemperature, setLeftTemperature] = useState("20"); // Temperature for left side
   const [rightTemperature, setRightTemperature] = useState("20"); // Temperature for right side
-
-  const handleStart = () => {
-    console.log(`Starting travel for ${distance} km`); // Replace with actual functionality
-  };
   const charge = 34; // Charge level can be dynamic or static for testing
   return (
     <div className="vehicle-container">
@@ -44,7 +40,7 @@ export default function VehicleView() {
                 key={index}
                 className={`battery-icon_wrapper lvl${
                   index + 1
-                } relative w-[20px] h-[40px] border-2 rounded-[4px] flex flex-col justify-end group`}
+                  } relative w-[20px] h-[40px] border-2 rounded-[4px] flex flex-col justify-end group`}
               >
                 <div className="absolute top-[-5px] left-1/2 transform -translate-x-1/2 bg-current rounded-[6px] w-[12px] h-[3px]" />
 
@@ -100,23 +96,9 @@ export default function VehicleView() {
         <span className="mt-2">{rightTemperature}°C</span>{" "}
         {/* Temperature display below the slider */}
       </div>
-      <div className="absolute bottom-0">
-        <div className="flex flex-col items-center mb-4">
-          <input
-            type="text"
-            value={distance}
-            onChange={(e) => setDistance(e.target.value)}
-            placeholder="Enter distance to travel (km)"
-            className="p-2 border border-gray-300 rounded-md w-full max-w-xs focus:outline-none focus:ring focus:ring-blue-500"
-          />
-          <button
-            onClick={handleStart}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
-          >
-            Start Travel
-          </button>
-        </div>
-      </div>
+      
+
+
     </div>
   );
 }

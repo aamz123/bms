@@ -1,4 +1,5 @@
 import VehicleView from "./components/VehicleView";
+import InputView from "./components/InputView";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
       </h1>
       <div>
         <VehicleView />
+        <InputView/>
       </div>
     </div>
   );
