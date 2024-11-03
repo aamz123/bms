@@ -1,5 +1,6 @@
 import Image from "next/image";
+import BatteryIndicator from "./components/batteryindicator";
 
 export default function Home() {
-  return <div className="text-2xl text-center">Hello World!</div>;
+  //return <div > <BatteryIndicator /></div>;
 }
