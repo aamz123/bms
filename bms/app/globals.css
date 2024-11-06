@@ -106,14 +106,6 @@ body {
   max-height: 90%; /* Ensures it doesn’t overflow */
 }
 
-/* Battery Icon Wrapper */
-.battery-icon_wrapper {
-  width: 34px; /* Adjust to scale down */
-  height: 30px; /* Adjust height */
-  border-radius: 4px;
-  border: 2px solid #333;
-}
-
 /* Right section (baggage) */
 .baggage {
   background-color: #a0a0a0;
