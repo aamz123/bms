@@ -9,7 +9,6 @@ export default function Home() {
       </h1>
       <div>
         <VehicleView />
-        <InputView/>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Light from "./Light";
+import InputView from "./InputView";
 export default function VehicleView() {
   const [lightsOn, setLightsOn] = useState<boolean>(false);
 
@@ -40,7 +41,7 @@ export default function VehicleView() {
                 key={index}
                 className={`battery-icon_wrapper lvl${
                   index + 1
-                  } relative w-[20px] h-[40px] border-2 rounded-[4px] flex flex-col justify-end group`}
+                } relative w-[20px] h-[40px] border-2 rounded-[4px] flex flex-col justify-end group`}
               >
                 <div className="absolute top-[-5px] left-1/2 transform -translate-x-1/2 bg-current rounded-[6px] w-[12px] h-[3px]" />
 
@@ -96,9 +97,8 @@ export default function VehicleView() {
         <span className="mt-2">{rightTemperature}°C</span>{" "}
         {/* Temperature display below the slider */}
       </div>
-      
 
-
+      <InputView />
     </div>
   );
 }
