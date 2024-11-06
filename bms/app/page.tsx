@@ -1,6 +1,8 @@
-import VehicleView from "./components/VehicleView";
-import InputView from "./components/InputView";
-
+"use client";
+import dynamic from "next/dynamic";
+const VehicleView = dynamic(() => import("./components/VehicleView"), {
+  ssr: false,
+});
 export default function Home() {
   return (
     <div>
