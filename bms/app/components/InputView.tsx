@@ -60,7 +60,7 @@ export default function InputView() {
         )}
         {selectedTab === "charging" && (
           <div className="charging-tab">
-            <div className="flex items-center justify-center mb-4">
+            <div className="flex items-center justify-center py-2">
               <button
                 onClick={toggleCharging}
                 className={`px-4 py-2 rounded-md ${
