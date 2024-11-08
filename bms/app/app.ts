@@ -5,7 +5,7 @@ import { createBatteries } from './lib/bmsprocessor';
 import { processCharging, processDischarging } from './lib/bmsprocessor';
 
 const cellCount = 100; // Total number of cells
-const batteryCount = 4; // Total number of batteries
+const batteryCount = 1; // Total number of batteries
 
 export let batteries = createBatteries(cellCount, batteryCount); // Create 4 batteries with 25 cells
 
