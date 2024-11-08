@@ -14,6 +14,15 @@ export default function VehicleView() {
   //const charge = 34; // Charge level can be dynamic or static for testing
   // Utility function to generate a random charge level between 0 and 100
   const getRandomCharge = () => Math.floor(Math.random() * 101);
+
+  // Function to determine the background color based on charge level
+  const getChargeColor = (charge: number) => {
+    if (charge < 20) return "bg-[#FF4C4C]"; // Red
+    if (charge >= 20 && charge < 40) return "bg-[#FFA94C]"; // Orange
+    if (charge >= 40 && charge < 60) return "bg-[#FFD700]"; // Gold
+    if (charge >= 60 && charge < 80) return "bg-[#A3E635]"; // Lime Green
+    return "bg-[#4CAF50]"; // Forest Green
+  };
   return (
     <div className="vehicle-container">
       <div className="flex flex-col items-center w-[6%]">
@@ -40,31 +49,34 @@ export default function VehicleView() {
           <div className="grid gap-5 z-10">
             {Array.from({ length: 100 }).map((_, index) => {
               const charge = getRandomCharge(); // Generate random charge for each battery cell
+              const chargeColor = getChargeColor(charge); // Get color based on charge
+              // Determine the border color based on the charge level
+              const borderColorClass =
+                charge === 0 || charge === 100
+                  ? chargeColor
+                  : "border-gray-300";
               return (
                 <div
                   key={index}
                   className={`battery-icon_wrapper lvl${
                     index + 1
-                  } relative w-[20px] h-[40px] border-2 rounded-[4px] flex flex-col justify-end group`}
+                  } relative w-[34px] h-[30px] border-2 ${
+                    charge === 0 ? "border-[#FF4C4C]" : "border-[#333]"
+                  } rounded-md flex flex-col justify-end items-center group`}
                 >
-                  <div className="absolute top-[-5px] left-1/2 transform -translate-x-1/2 bg-current rounded-[6px] w-[12px] h-[3px]" />
+                  {/* White top indicator */}
+                  <div className="absolute top-[-5px] left-1/2 transform -translate-x-1/2 bg-white rounded-[6px] w-[12px] h-[3px]" />
 
-                  {/* Display the battery icon based on the charge level */}
-                  {charge < 20 && (
-                    <div className="battery-icon_1 w-full h-[8px] bg-[#FF4C4C]"></div>
-                  )}
-                  {charge >= 20 && charge < 40 && (
-                    <div className="battery-icon_2 w-full h-[12px] bg-[#FFA94C]"></div>
-                  )}
-                  {charge >= 40 && charge < 60 && (
-                    <div className="battery-icon_3 w-full h-[16px] bg-[#FFD700]"></div>
-                  )}
-                  {charge >= 60 && charge < 80 && (
-                    <div className="battery-icon_4 w-full h-[20px] bg-[#A3E635]"></div>
-                  )}
-                  {charge >= 80 && (
-                    <div className="battery-icon_5 w-full h-full rounded-[2px] bg-[#4CAF50]"></div>
-                  )}
+                  <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-white font-semibold">
+                    {charge}%
+                  </span>
+                  {/* Inner fill based on charge level */}
+                  <div
+                    className={`w-full ${chargeColor} rounded-b-md ${
+                      charge > 94 ? "rounded-t-md" : ""
+                    }`}
+                    style={{ height: `${charge}%` }}
+                  ></div>
 
                   {/* Tooltip for showing details on hover */}
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 w-max bg-gray-700 text-white text-sm rounded py-1 px-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
