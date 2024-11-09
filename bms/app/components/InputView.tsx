@@ -1,15 +1,37 @@
 "use client";
 import { useState } from "react";
-export default function InputView() {
+import {Battery} from '../models/Battery';
+
+interface InputViewProps {
+  battery: Battery;
+  setBattery: React.Dispatch<React.SetStateAction<Battery>>;
+}
+
+export default function InputView({ battery, setBattery }: InputViewProps) {
   const [selectedTab, setSelectedTab] = useState("distance");
   const [chargingOn, setChargingOn] = useState(false);
   const [distance, setDistance] = useState(""); // State to hold distance input
   const toggleCharging = () => {
     setChargingOn(!chargingOn); // Toggle charging state
   };
+
+
   const handleStart = () => {
-    console.log(`Starting travel for ${distance} km`); // Replace with actual functionality
+
+    const parsedDistance = parseFloat(distance); // Convert distance to a number
+    if (isNaN(parsedDistance)) {
+      console.error("Please enter a valid number for distance.");
+      return;
+    }
+
+    const numberOfCells = Math.floor(Number(parsedDistance) / 2); // Calculate cells to discharge
+    console.log(`Starting travel for ${distance} km, discharging ${numberOfCells} cells.`);
+    battery.discharge(numberOfCells, setBattery); // Call the discharge function
   };
+
+
+
+  
   return (
     <div className="inputsection absolute bottom-0 py-1">
       {/* Tabs */}
