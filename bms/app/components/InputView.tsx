@@ -1,18 +1,19 @@
 "use client";
 import { useState } from "react";
 import {Battery} from '../models/Battery';
+import {batteryInstance} from "../models/batterySingleton";
 
-interface InputViewProps {
-  battery: Battery;
-  setBattery: React.Dispatch<React.SetStateAction<Battery>>;
-}
 
-export default function InputView({ battery, setBattery }: InputViewProps) {
+
+export default function InputView() {
   const [selectedTab, setSelectedTab] = useState("distance");
   const [chargingOn, setChargingOn] = useState(false);
   const [distance, setDistance] = useState(""); // State to hold distance input
+
+
   const toggleCharging = () => {
-    setChargingOn(!chargingOn); // Toggle charging state
+    console.log('Starting charging');
+    batteryInstance.charge();
   };
 
 
@@ -26,7 +27,7 @@ export default function InputView({ battery, setBattery }: InputViewProps) {
 
     const numberOfCells = Math.floor(Number(parsedDistance) / 2); // Calculate cells to discharge
     console.log(`Starting travel for ${distance} km, discharging ${numberOfCells} cells.`);
-    battery.discharge(numberOfCells, setBattery); // Call the discharge function
+    batteryInstance.discharge(numberOfCells); // Call the discharge function
   };
 
 

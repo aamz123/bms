@@ -31,10 +31,12 @@ export class Cell {
 
     // Method to get charge color based on stateOfCharge percentage
   getCellChargeColor(): string {
+    
     if (this.stateOfCharge < 20) return "bg-[#FF4C4C]"; // Red
     if (this.stateOfCharge >= 20 && this.stateOfCharge < 40) return "bg-[#FFA94C]"; // Orange
     if (this.stateOfCharge >= 40 && this.stateOfCharge < 60) return "bg-[#FFD700]"; // Gold
     if (this.stateOfCharge >= 60 && this.stateOfCharge < 80) return "bg-[#A3E635]"; // Lime Green
+    if(this.stateOfCharge == 80 && this.chargingStatus == 'C') return "bg-[#FF4C4C]"
     return "bg-[#4CAF50]"; // Forest Green (for charge 80% and above)
   }
 
