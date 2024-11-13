@@ -104,15 +104,15 @@ export default function VehicleView() {
                   {/* White top indicator */}
                   <div className="absolute top-[-5px] left-1/2 transform -translate-x-1/2 bg-white rounded-[6px] w-[12px] h-[3px]" />
 
-                  <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-white font-semibold">
+                  <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-white font-semibold z-50">
                     {charge}%
                   </span>
                   {/* Inner fill based on charge level */}
                   <div
-                    className={`w-full ${chargeColor} rounded-b-md ${
+                    className={`absolute bottom-0 w-full ${chargeColor} rounded-b-md ${
                       charge > 94 ? "rounded-t-md" : ""
                     }`}
-                    style={{ height: `${charge}%` }}
+                    style={{ height: `${charge}%`}}
                   ></div>
 
                   {/* Tooltip for showing details on hover */}
