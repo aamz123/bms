@@ -104,7 +104,7 @@ export default function VehicleView() {
                   {/* White top indicator */}
                   <div className="absolute top-[-5px] left-1/2 transform -translate-x-1/2 bg-white rounded-[6px] w-[12px] h-[3px]" />
 
-                  <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-white font-semibold z-50">
+                  <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-white font-semibold z-10  ">
                     {charge}%
                   </span>
                   {/* Inner fill based on charge level */}
@@ -116,7 +116,7 @@ export default function VehicleView() {
                   ></div>
 
                   {/* Tooltip for showing details on hover */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 w-max bg-gray-700 text-white text-sm rounded py-1 px-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none">
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 w-max bg-gray-700 text-white text-sm rounded py-1 px-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none z-50">
                     Cell ID: {cell.cellId}<br />
                     Temperature: {cell.temperature}°C<br />
                     State of Charge: {cell.stateOfCharge}%<br />
