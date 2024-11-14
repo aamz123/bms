@@ -1,3 +1,5 @@
+import GlobalSettings from './GlobalSettings';
+
 export class Node {
     cellId: number;
     next: Node | null;
@@ -45,18 +47,58 @@ export class Node {
     }
   
     removeNodes(count: number): Node[] {
-      const dischargedCells: Node[] = [];
-      for (let i = 0; i < count && this.head !== null; i++) {
-        const cell = this.head;
-        dischargedCells.push(cell); // Store the removed cells
-        this.head = this.head.next;
-        if (this.head) {
-          this.head.prev = null;
-        } else {
-          this.tail = null;
-        }
-        this.size--;
+      const isSkipQuadrant1 = GlobalSettings.isSkipQuadrant1;
+      const isSkipQuadrant2 = GlobalSettings.isSkipQuadrant2;
+      const isSkipQuadrant3 = GlobalSettings.isSkipQuadrant3;
+      const isSkipQuadrant4 = GlobalSettings.isSkipQuadrant4;
+    
+      // If all skip flags are true, consider them as false
+      if (isSkipQuadrant1 && isSkipQuadrant2 && isSkipQuadrant3 && isSkipQuadrant4) {
+        GlobalSettings.isSkipQuadrant1 = false;
+        GlobalSettings.isSkipQuadrant2 = false;
+        GlobalSettings.isSkipQuadrant3 = false;
+        GlobalSettings.isSkipQuadrant4 = false;
       }
+    
+      const dischargedCells: Node[] = [];
+      let removedCount = 0;
+      let currentNode = this.head;
+    
+      while (removedCount < count && currentNode !== null) {
+        const cellId = currentNode.cellId;
+        const quadrant = getQuadrant(cellId);
+    
+        if (
+          (quadrant === 1 && isSkipQuadrant1) ||
+          (quadrant === 2 && isSkipQuadrant2) ||
+          (quadrant === 3 && isSkipQuadrant3) ||
+          (quadrant === 4 && isSkipQuadrant4)
+        ) {
+          // Skip this cell and move to the next
+          currentNode = currentNode.next;
+        } else {
+          // Remove this cell
+          dischargedCells.push(currentNode);
+    
+          // Update pointers
+          if (currentNode.prev) {
+            currentNode.prev.next = currentNode.next;
+          } else {
+            this.head = currentNode.next;
+          }
+    
+          if (currentNode.next) {
+            currentNode.next.prev = currentNode.prev;
+          } else {
+            this.tail = currentNode.prev;
+          }
+    
+          this.size--;
+          removedCount++;
+          currentNode = currentNode.next;
+        }
+      }
+    
       return dischargedCells;
     }
   
@@ -80,4 +122,23 @@ export class Node {
 
     
   }
+
+  // Helper function to get the quadrant of a cell
+  function getQuadrant(cellId: number): number {
+    if (cellId < 0 || cellId > 99) {
+      throw new Error("cellId must be between 0 and 99");
+    }
   
+    const row = Math.floor(cellId / 10);
+    const col = cellId % 10;
+  
+    if (row < 5 && col < 5) {
+      return 1; // Quadrant 1
+    } else if (row < 5 && col >= 5) {
+      return 2; // Quadrant 2
+    } else if (row >= 5 && col < 5) {
+      return 3; // Quadrant 3
+    } else {
+      return 4; // Quadrant 4
+    }
+  }

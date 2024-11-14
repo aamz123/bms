@@ -5,6 +5,27 @@ import InputView from "./InputView";
 import {Battery} from '../models/Battery';
 import {Cell} from '../models/Cell';
 import {batteryInstance} from "../models/batterySingleton";
+import GlobalSettings from '../models/GlobalSettings';
+
+const updateSkipQuadrant1 = (value: boolean) => {
+  GlobalSettings.isSkipQuadrant1 = value;
+};
+
+const updateSkipQuadrant2 = (value: boolean) => {
+  GlobalSettings.isSkipQuadrant2 = value;
+};
+
+const updateSkipQuadrant3 = (value: boolean) => {
+  GlobalSettings.isSkipQuadrant3 = value;
+};
+
+const updateSkipQuadrant4 = (value: boolean) => {
+  GlobalSettings.isSkipQuadrant4 = value;
+};
+
+const updateSuperCharged = (value: boolean) => {
+  GlobalSettings.isSuperCharged = value;
+};
 
 export default function VehicleView() {
 
@@ -46,7 +67,7 @@ export default function VehicleView() {
 
   const toggleCharging = () => {
     console.log('Starting charging');
-    batteryInstance.charge(4, updateBatteryState);
+    batteryInstance.charge(updateBatteryState);
   };
 
 

@@ -1,5 +1,6 @@
 import { Cell } from "./Cell";
 import {DoublyLinkedList} from "./Queue"
+import GlobalSettings from './GlobalSettings';
 
 
 export class Battery {
@@ -117,10 +118,19 @@ export class Battery {
     }, 1000); // 1 second delay for each 10% discharge
   }
 
-  charge(
-    numberOfCellsChargedAtATime: number,
-    updateBatteryState: () => void
-  ): void {
+  charge(updateBatteryState: () => void): void {
+
+    // Determine charging parameters based on isSuperCharged
+    const isSuperCharged = GlobalSettings.isSuperCharged;
+    const numberOfCellsChargedAtATime = isSuperCharged ? 7 : 4;
+    const chargeIncrement = isSuperCharged ? 10 : 5;
+    const delay = isSuperCharged ? 500 : 1000;
+
+    /*const numberOfCellsChargedAtATime = 4;
+    const chargeIncrement = 10;
+    const delay = 1000;*/
+
+    
     // Move discharged cells to charging queue
     this.chargingQueue.push(...this.dischargedCells);
     this.dischargedCells = []; // Clear discharged cells
@@ -159,10 +169,10 @@ export class Battery {
 
           // If cell is below 80%, charge up to 80%, then stop until all cells in the batch reach 80%
           if (cell.stateOfCharge < 80) {
-            cell.stateOfCharge = Math.min(cell.stateOfCharge + 10, 80);
+            cell.stateOfCharge = Math.min(cell.stateOfCharge + chargeIncrement, 80);
           } else {
             // Continue charging cells from 80% to 100%
-            cell.stateOfCharge = Math.min(cell.stateOfCharge + 10, 100);
+            cell.stateOfCharge = Math.min(cell.stateOfCharge + chargeIncrement, 100);
           }
 
           // Update UI with the latest state
@@ -198,7 +208,25 @@ export class Battery {
           (cellIndex) => this.battery[cellIndex].stateOfCharge < 100
         );
       }
-    }, 1000); // 1-second delay between charging updates
+    }, delay); // 1-second delay between charging updates
+  }
+
+  getQuadrant(cellId: number): number {
+    if (cellId < 0 || cellId > 99) {
+      throw new Error("cellId must be between 0 and 99");
+    }
+  
+    const row = Math.floor(cellId / 10);
+    const col = cellId % 10;
+  
+    if (row < 5 && col < 5) {
+      return 1; // Quadrant 1
+    } else if (row < 5 && col >= 5) {
+      return 2; // Quadrant 2
+    } else if (row >= 5 && col < 5) {
+      return 3; // Quadrant 3
+    } else {
+      return 4; // Quadrant 4
+    }
   }
 }
-
