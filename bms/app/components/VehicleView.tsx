@@ -10,21 +10,30 @@ import LogOutput from "./LogOutput";
 
 const updateSkipQuadrant1 = (value: boolean) => {
   GlobalSettings.isSkipQuadrant1 = value;
+  console.log("quad 1"+value);// for checking if the value is changing or not
+  
 };
 
 const updateSkipQuadrant2 = (value: boolean) => {
   GlobalSettings.isSkipQuadrant2 = value;
+  console.log("quad 2"+value);// for checking if the value is changing or not
 };
 
 const updateSkipQuadrant3 = (value: boolean) => {
   GlobalSettings.isSkipQuadrant3 = value;
+  console.log("quad 3"+value);// for checking if the value is changing or not
 };
 
 const updateSkipQuadrant4 = (value: boolean) => {
   GlobalSettings.isSkipQuadrant4 = value;
+  console.log("quad 4"+value);// for checking if the value is changing or not
 };
 
 const updateSuperCharged = (value: boolean) => {
+  GlobalSettings.isSuperCharged = value;
+};
+//added overnight chanegd 
+const updateOverNightCharged = (value: boolean) => {
   GlobalSettings.isSuperCharged = value;
 };
 
@@ -164,6 +173,34 @@ export default function VehicleView() {
         {/* Battery Section */}
         <div className="vehicle-section battery">
           <div className="grid gap-5 z-10">
+          <button
+            onClick={() => updateSkipQuadrant2(!GlobalSettings.isSkipQuadrant2)}
+            className="sun-button absolute top-[5%] right-[+30px] text-3xl"
+            title="Toggle Quadrant 2"
+          >
+            {GlobalSettings.isSkipQuadrant2 ? "☀️": "⛅"}
+          </button>
+          <button
+            onClick={() => updateSkipQuadrant4(!GlobalSettings.isSkipQuadrant4)}
+            className="sun-button absolute bottom-[10px] left-[+30px] text-3xl"
+            title="Toggle Quadrant 4"
+          >
+            {GlobalSettings.isSkipQuadrant4 ? "☀️": "⛅"}
+          </button>
+          <button
+            onClick={() => updateSkipQuadrant1(!GlobalSettings.isSkipQuadrant1)}
+            className="sun-button absolute top-[10px] left-[+30px] text-3xl"
+            title="Toggle Quadrant 1"
+          >
+            {GlobalSettings.isSkipQuadrant1 ? "☀️": "⛅"}
+          </button>
+          <button
+            onClick={() => updateSkipQuadrant3(!GlobalSettings.isSkipQuadrant3)}
+            className="sun-button absolute bottom-[10px] right-[+30px] text-3xl"
+            title="Toggle Quadrant 3"
+          >
+            {GlobalSettings.isSkipQuadrant3 ? "☀️": "⛅"}
+          </button>
             {battery.battery.map((cell: Cell, index: number) => {
 
               const charge = cell.stateOfCharge; // Generate random charge for each battery cell
