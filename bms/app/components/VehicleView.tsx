@@ -105,6 +105,8 @@ export default function VehicleView() {
       updateSuperCharged(true);
     }
     batteryInstance.charge(updateBatteryState);
+    // Method 2
+    //batteryInstance.charge2(4, updateBatteryState);
   };
 
   const toggleOverNightCharging = () => {
@@ -129,6 +131,9 @@ export default function VehicleView() {
     const numberOfCells = Math.floor(Number(parsedDistance) / 2); // Calculate cells to discharge
     console.log(`Starting travel for ${distance} km, discharging ${numberOfCells} cells.`);
     batteryInstance.discharge(numberOfCells, updateBatteryState); // Call the discharge function
+
+    // Implementation 1
+    //batteryInstance.discharge2(parsedDistance, updateBatteryState);
   };
 
   return (
@@ -213,7 +218,7 @@ export default function VehicleView() {
                   className={`battery-icon_wrapper lvl${cell.cellId} relative w-[34px] h-[30px] border-2 ${charge === 0 ? "border-[#FF4C4C]" : "border-[#333]"
                     } rounded-md group m-[5px]`}
                   style={{
-                    boxShadow: cell.temperature > 28
+                    boxShadow: cell.temperature > 80
                       ? '0 0 5px 5px rgba(255, 0, 0, 0.6)' // Red glow for high temperature
                       : cell.temperature == 25
                         ? '0 0 5px 5px rgba(0, 255, 0, 0.6)' // Green glow for low temperature
@@ -240,6 +245,7 @@ export default function VehicleView() {
                     State of Charge: {cell.stateOfCharge}%<br />
                     Voltage: {cell.voltage}V<br />
                     Quadrant: {cell.quadrant}<br />
+                    Cycles: {cell.numberOfChargeCycles} <br/>
                     Charging Status: {cell.chargingStatus === 'C' ? 'Charging' : cell.chargingStatus === 'D' ? 'Discharging' : 'Idle'}
                   </div>
                 </div>

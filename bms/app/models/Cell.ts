@@ -17,7 +17,7 @@ export class Cell {
       this.temperature = 25; // Default room temperature
       this.voltage = 3.7; // Typical voltage for a lithium-ion cell
       this.numberOfChargeCycles = 0; // Default number of cycles
-      this.bestAvailableChargeValue = this.calculateBestAvailableChargeValue();
+      this.bestAvailableChargeValue = this.calculateDischargingBAC();
       this.quadrant = this.getQuadrant(); // Determine quadrant when the cell is created
       this.chargingStatus = 'I';
     }
@@ -57,5 +57,14 @@ export class Cell {
       return col < 5 ? 3 : 4; // Quadrant 3 (bottom-left), Quadrant 4 (bottom-right)
     }
   }
+
+  calculateDischargingBAC() : number{
+    return 1/(this.temperature+1) * 1/(this.numberOfChargeCycles+1) * this.stateOfCharge;
+  }
+
+  calculateChargingBAC() : number {
+    return 1/(this.temperature+1) * 1/(this.numberOfChargeCycles+1) * 1/(this.stateOfCharge);
+  }
+
   }
   

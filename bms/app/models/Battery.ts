@@ -1,6 +1,7 @@
 import { Cell } from "./Cell";
 import {DoublyLinkedList} from "./Queue"
 import GlobalSettings from './GlobalSettings';
+import  { MaxHeap } from "./MaxHeap"
 
 
 export class Battery {
@@ -15,6 +16,10 @@ export class Battery {
   dischargedCells: number[];
   chargingQueue: number[];
   observers: Function[] = [];
+  cellHeap: MaxHeap<Cell>;
+  dischargingCells1: Cell[] = [];
+  chargingCells1: Cell[] = [];
+  //totalChargeAvailable = 0;
 
   constructor() {
     this.battery = Array.from({ length: 100 }, (_, cellId) => new Cell(cellId));
@@ -27,6 +32,13 @@ export class Battery {
     this.dischargeQueue = new DoublyLinkedList(100); //initialize discharge queue.
     this.dischargedCells = [];
     this.chargingQueue = [];
+    this.cellHeap = new MaxHeap<Cell>((a, b) => a.bestAvailableChargeValue - b.bestAvailableChargeValue);
+
+    this.battery.forEach(cell => {
+      this.cellHeap.insert(cell);
+    });
+    this.reduceIdleTemperature();
+    console.log("new battery created")
   }
 
   // Method to add observers
@@ -42,6 +54,14 @@ export class Battery {
   // Calculate the average temperature of the battery
   calculateBatteryTemperature(): number {
     const totalTemperature = this.battery.reduce(
+      (total, cell) => total + cell.temperature,
+      0
+    );
+    return totalTemperature / this.battery.length;
+  }
+
+  calculateIdleCellAvgTemperature(): number{
+    const totalTemperature = this.cellHeap.heap.reduce(
       (total, cell) => total + cell.temperature,
       0
     );
@@ -210,6 +230,165 @@ export class Battery {
       }
     }, delay); // 1-second delay between charging updates
   }
+
+  public async discharge2(distance: number, updateBatteryState: () => void): Promise<void> {
+      this.calculateDischargingBAC();
+      var totalChargeNeeded = distance * 10; // total charge percent of needed 
+      //this.totalChargeAvailable = 0;
+      this.getCells(totalChargeNeeded);
+      
+      while(totalChargeNeeded > 0){
+        // const dischargeInterval = setInterval(() => {
+          if (this.getTotalAvailabeCharge() >= totalChargeNeeded){
+
+            // start discharging
+            for (let i = 0; i < this.dischargingCells1.length; i++) {
+              const cell = this.dischargingCells1[i];
+
+              
+              cell.chargingStatus = "D";
+              if (cell.stateOfCharge > 0) {
+  
+                // Reduce state of charge by 10%
+                cell.stateOfCharge = Math.max(0, cell.stateOfCharge - 10);
+                totalChargeNeeded = Math.max(0, totalChargeNeeded - 10);
+                if (cell.stateOfCharge == 0 || cell.stateOfCharge == 50){
+                  cell.numberOfChargeCycles++;
+                }
+  
+                // TODO
+                // need to add logic to consider ambient temp
+                // need to pass in which quadrant the sun is, and then add more temp increment for cells in that quadrant
+                // will implement after front end part is completed 
+                var quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
+                cell.temperature = Math.round(cell.temperature + 5*quadTemp/100);
+                if (cell.temperature > this.calculateIdleCellAvgTemperature() + 5) {
+                  cell.chargingStatus = "I";
+                  cell.bestAvailableChargeValue = cell.calculateDischargingBAC();
+                  this.cellHeap.insert(cell);
+                  this.dischargingCells1.splice(i, 1);
+                }
+              }
+            }
+            updateBatteryState();
+          } else {
+            this.getCells(totalChargeNeeded);
+          }
+          console.log(this.calculateIdleCellAvgTemperature());
+          console.log( "need: " + totalChargeNeeded + "available: " + this.getTotalAvailabeCharge() + "lenght: " + this.dischargingCells1.length );
+          await this.sleep(200);
+        
+      }
+      this.pushBackIntoHeap();  
+      console.log("heaplenght" + this.cellHeap.heap.length)
+  }
+
+  public async charge2(numberOfCellsChargedAtATime: number, updateBatteryState: () => void) {
+    this.calculateChargingBAC();
+    while(this.calculateStateOfCharge() != 100){
+      this.getChargingCells(numberOfCellsChargedAtATime);
+      for (let i = 0; i < this.chargingCells1.length; i++) {
+        var cell = this.chargingCells1[i];
+        cell.chargingStatus = "C";
+        if(cell.stateOfCharge < 100){
+          cell.stateOfCharge = Math.min(100, cell.stateOfCharge + 10);
+          var quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
+          cell.temperature = Math.round(cell.temperature + 5*quadTemp/100);
+          if (cell.temperature >  80){
+            cell.chargingStatus = "I";
+            cell.bestAvailableChargeValue = cell.calculateChargingBAC();
+            this.cellHeap.insert(cell);
+            this.chargingCells1.splice(i, 1);
+          }
+        }
+      }
+      updateBatteryState();
+      await this.sleep(400);
+    }
+    this.pushBackIntoHeap();
+    console.log("heaplenght" + this.cellHeap.heap.length)
+  }
+
+  private pushBackIntoHeap() {
+    this.dischargingCells1.forEach(cell => {
+      cell.chargingStatus = "I"
+      var index = this.cellHeap.heap.findIndex(c => c.cellId == cell.cellId)
+      if(index == -1){
+        this.cellHeap.insert(cell);
+      } else {
+        this.cellHeap.heap[index] = cell;
+      }
+    });
+    this.dischargingCells1 = [];
+    
+    this.chargingCells1.forEach(cell => {
+      cell.chargingStatus = "I"
+      var index = this.cellHeap.heap.findIndex(c => c.cellId == cell.cellId)
+      if(index == -1){
+        this.cellHeap.insert(cell);
+      } else {
+        this.cellHeap.heap[index] = cell;
+      }
+    })
+    this.chargingCells1 = [];
+  }
+
+  private calculateChargingBAC() {
+    this.cellHeap.heap.forEach(cell => {
+      cell.bestAvailableChargeValue = cell.calculateChargingBAC();
+    })
+    this.cellHeap.reheap();
+  }
+
+  private calculateDischargingBAC() {
+    this.cellHeap.heap.forEach(cell => {
+      cell.bestAvailableChargeValue = cell.calculateDischargingBAC();
+    })
+    this.cellHeap.reheap();
+  }
+
+  private getCells(totalChargeNeeded : number){
+    while (this.getTotalAvailabeCharge() < totalChargeNeeded){
+      var cell = this.cellHeap.extractMax();
+      if (cell){
+        this.dischargingCells1.push(cell);
+      }
+    }
+  }
+
+  private getTotalAvailabeCharge() : number{
+    var totalAvailable = 0;
+    this.dischargingCells1.forEach(cell => {
+      totalAvailable += cell.stateOfCharge;
+    });
+    return totalAvailable;
+  }
+
+  private getChargingCells(maxCellCount : number) {
+    for(var i = 0; i < maxCellCount; i++){
+      var cell = this.cellHeap.extractMax();
+      if (cell) {
+        this.chargingCells1.push(cell);
+      }
+    }
+  }
+
+  private sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private reduceIdleTemperature(){
+    const reduceTemp = setInterval(() => {
+      this.cellHeap.heap.forEach(cell => {
+        if (cell.chargingStatus == "I" && cell.temperature > 25){
+          cell.temperature -= 1
+          cell.bestAvailableChargeValue = cell.calculateDischargingBAC();
+        }
+      });
+      //console.log("reduced")
+    }, 1000);
+  }
+
 
   getQuadrant(cellId: number): number {
     if (cellId < 0 || cellId > 99) {
