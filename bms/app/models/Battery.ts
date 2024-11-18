@@ -1,7 +1,7 @@
 import { Cell } from "./Cell";
-import {DoublyLinkedList} from "./Queue"
+import { DoublyLinkedList } from "./Queue"
 import GlobalSettings from './GlobalSettings';
-import  { MaxHeap } from "./MaxHeap"
+import { MaxHeap } from "./MaxHeap"
 
 
 export class Battery {
@@ -60,7 +60,7 @@ export class Battery {
     return totalTemperature / this.battery.length;
   }
 
-  calculateIdleCellAvgTemperature(): number{
+  calculateIdleCellAvgTemperature(): number {
     const totalTemperature = this.cellHeap.heap.reduce(
       (total, cell) => total + cell.temperature,
       0
@@ -150,7 +150,7 @@ export class Battery {
     const chargeIncrement = 10;
     const delay = 1000;*/
 
-    
+
     // Move discharged cells to charging queue
     this.chargingQueue.push(...this.dischargedCells);
     this.dischargedCells = []; // Clear discharged cells
@@ -232,69 +232,70 @@ export class Battery {
   }
 
   public async discharge2(distance: number, updateBatteryState: () => void): Promise<void> {
-      this.calculateDischargingBAC();
-      var totalChargeNeeded = distance * 10; // total charge percent of needed 
-      //this.totalChargeAvailable = 0;
-      this.getCells(totalChargeNeeded);
-      
-      while(totalChargeNeeded > 0){
-        // const dischargeInterval = setInterval(() => {
-          if (this.getTotalAvailabeCharge() >= totalChargeNeeded){
+    this.calculateDischargingBAC();
+    var totalChargeNeeded = distance * 10; // total charge percent of needed 
+    //this.totalChargeAvailable = 0;
+    this.getCells(totalChargeNeeded);
 
-            // start discharging
-            for (let i = 0; i < this.dischargingCells1.length; i++) {
-              const cell = this.dischargingCells1[i];
+    while (totalChargeNeeded > 0) {
+      // const dischargeInterval = setInterval(() => {
+      if (this.getTotalAvailabeCharge() >= totalChargeNeeded) {
 
-              
-              cell.chargingStatus = "D";
-              if (cell.stateOfCharge > 0) {
-  
-                // Reduce state of charge by 10%
-                cell.stateOfCharge = Math.max(0, cell.stateOfCharge - 10);
-                totalChargeNeeded = Math.max(0, totalChargeNeeded - 10);
-                if (cell.stateOfCharge == 0 || cell.stateOfCharge == 50){
-                  cell.numberOfChargeCycles++;
-                }
-  
-                // TODO
-                // need to add logic to consider ambient temp
-                // need to pass in which quadrant the sun is, and then add more temp increment for cells in that quadrant
-                // will implement after front end part is completed 
-                var quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
-                cell.temperature = Math.round(cell.temperature + 5*quadTemp/100);
-                if (cell.temperature > this.calculateIdleCellAvgTemperature() + 5) {
-                  cell.chargingStatus = "I";
-                  cell.bestAvailableChargeValue = cell.calculateDischargingBAC();
-                  this.cellHeap.insert(cell);
-                  this.dischargingCells1.splice(i, 1);
-                }
-              }
+        // start discharging
+        for (let i = 0; i < this.dischargingCells1.length; i++) {
+          const cell = this.dischargingCells1[i];
+
+
+          cell.chargingStatus = "D";
+          if (cell.stateOfCharge > 0) {
+
+            // Reduce state of charge by 10%
+            cell.stateOfCharge = Math.max(0, cell.stateOfCharge - 10);
+            totalChargeNeeded = Math.max(0, totalChargeNeeded - 10);
+            if (cell.stateOfCharge == 0 || cell.stateOfCharge == 50) {
+              cell.numberOfChargeCycles++;
             }
-            updateBatteryState();
-          } else {
-            this.getCells(totalChargeNeeded);
+
+            // TODO
+            // need to add logic to consider ambient temp
+            // need to pass in which quadrant the sun is, and then add more temp increment for cells in that quadrant
+            // will implement after front end part is completed 
+            var quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
+            console.log("Quadrant " + cell.getQuadrant() + " Temperature is % " + quadTemp)
+            cell.temperature = Math.round(cell.temperature + 5 * quadTemp / 100);
+            if (cell.temperature > this.calculateIdleCellAvgTemperature() + 5) {
+              cell.chargingStatus = "I";
+              cell.bestAvailableChargeValue = cell.calculateDischargingBAC();
+              this.cellHeap.insert(cell);
+              this.dischargingCells1.splice(i, 1);
+            }
           }
-          console.log(this.calculateIdleCellAvgTemperature());
-          console.log( "need: " + totalChargeNeeded + "available: " + this.getTotalAvailabeCharge() + "lenght: " + this.dischargingCells1.length );
-          await this.sleep(200);
-        
+        }
+        updateBatteryState();
+      } else {
+        this.getCells(totalChargeNeeded);
       }
-      this.pushBackIntoHeap();  
-      console.log("heaplenght" + this.cellHeap.heap.length)
+      console.log(this.calculateIdleCellAvgTemperature());
+      console.log("need: " + totalChargeNeeded + "available: " + this.getTotalAvailabeCharge() + "lenght: " + this.dischargingCells1.length);
+      await this.sleep(200);
+
+    }
+    this.pushBackIntoHeap();
+    console.log("heaplenght" + this.cellHeap.heap.length)
   }
 
   public async charge2(numberOfCellsChargedAtATime: number, updateBatteryState: () => void) {
     this.calculateChargingBAC();
-    while(this.calculateStateOfCharge() != 100){
+    while (this.calculateStateOfCharge() != 100) {
       this.getChargingCells(numberOfCellsChargedAtATime);
       for (let i = 0; i < this.chargingCells1.length; i++) {
         var cell = this.chargingCells1[i];
         cell.chargingStatus = "C";
-        if(cell.stateOfCharge < 100){
+        if (cell.stateOfCharge < 100) {
           cell.stateOfCharge = Math.min(100, cell.stateOfCharge + 10);
           var quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
-          cell.temperature = Math.round(cell.temperature + 5*quadTemp/100);
-          if (cell.temperature >  80){
+          cell.temperature = Math.round(cell.temperature + 5 * quadTemp / 100);
+          if (cell.temperature > 80) {
             cell.chargingStatus = "I";
             cell.bestAvailableChargeValue = cell.calculateChargingBAC();
             this.cellHeap.insert(cell);
@@ -313,18 +314,18 @@ export class Battery {
     this.dischargingCells1.forEach(cell => {
       cell.chargingStatus = "I"
       var index = this.cellHeap.heap.findIndex(c => c.cellId == cell.cellId)
-      if(index == -1){
+      if (index == -1) {
         this.cellHeap.insert(cell);
       } else {
         this.cellHeap.heap[index] = cell;
       }
     });
     this.dischargingCells1 = [];
-    
+
     this.chargingCells1.forEach(cell => {
       cell.chargingStatus = "I"
       var index = this.cellHeap.heap.findIndex(c => c.cellId == cell.cellId)
-      if(index == -1){
+      if (index == -1) {
         this.cellHeap.insert(cell);
       } else {
         this.cellHeap.heap[index] = cell;
@@ -347,16 +348,16 @@ export class Battery {
     this.cellHeap.reheap();
   }
 
-  private getCells(totalChargeNeeded : number){
-    while (this.getTotalAvailabeCharge() < totalChargeNeeded){
+  private getCells(totalChargeNeeded: number) {
+    while (this.getTotalAvailabeCharge() < totalChargeNeeded) {
       var cell = this.cellHeap.extractMax();
-      if (cell){
+      if (cell) {
         this.dischargingCells1.push(cell);
       }
     }
   }
 
-  private getTotalAvailabeCharge() : number{
+  private getTotalAvailabeCharge(): number {
     var totalAvailable = 0;
     this.dischargingCells1.forEach(cell => {
       totalAvailable += cell.stateOfCharge;
@@ -364,8 +365,8 @@ export class Battery {
     return totalAvailable;
   }
 
-  private getChargingCells(maxCellCount : number) {
-    for(var i = 0; i < maxCellCount; i++){
+  private getChargingCells(maxCellCount: number) {
+    for (var i = 0; i < maxCellCount; i++) {
       var cell = this.cellHeap.extractMax();
       if (cell) {
         this.chargingCells1.push(cell);
@@ -377,10 +378,10 @@ export class Battery {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private reduceIdleTemperature(){
+  private reduceIdleTemperature() {
     const reduceTemp = setInterval(() => {
       this.cellHeap.heap.forEach(cell => {
-        if (cell.chargingStatus == "I" && cell.temperature > 25){
+        if (cell.chargingStatus == "I" && cell.temperature > 25) {
           cell.temperature -= 1
           cell.bestAvailableChargeValue = cell.calculateDischargingBAC();
         }
@@ -394,10 +395,10 @@ export class Battery {
     if (cellId < 0 || cellId > 99) {
       throw new Error("cellId must be between 0 and 99");
     }
-  
+
     const row = Math.floor(cellId / 10);
     const col = cellId % 10;
-  
+
     if (row < 5 && col < 5) {
       return 1; // Quadrant 1
     } else if (row < 5 && col >= 5) {

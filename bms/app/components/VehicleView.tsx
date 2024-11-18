@@ -44,16 +44,11 @@ export default function VehicleView() {
   const [overNightChargingOn, setOverNightChargingOn] = useState(false);
   const [distance, setDistance] = useState(""); // State to hold distance input
 
-
-
-
   const [lightsOn, setLightsOn] = useState<boolean>(false);
 
   const toggleLights = (): void => {
     setLightsOn(!lightsOn);
   };
-
-
 
   const updateQ1Temperature = (value: number) => {
     GlobalSettings.q1temperature = value;
@@ -75,11 +70,12 @@ export default function VehicleView() {
   const [q2Temperature, setQ2Temperature] = useState("30"); // Temperature for Q2
   const [q3Temperature, setQ3Temperature] = useState("40"); // Temperature for Q3
   const [q4Temperature, setQ4Temperature] = useState("60"); // Temperature for Q4
-
-
+  updateQ1Temperature(parseFloat(q1Temperature))
+  updateQ2Temperature(parseFloat(q2Temperature))
+  updateQ3Temperature(parseFloat(q3Temperature))
+  updateQ4Temperature(parseFloat(q4Temperature))
   //Battery Stuff
   const [battery, setBattery] = useState(batteryInstance);
-
 
   const updateBatteryState = () => {
     setBattery({ ...batteryInstance }); // Trigger re-render by updating state
@@ -104,9 +100,9 @@ export default function VehicleView() {
       setSuperChargingOn(true);
       updateSuperCharged(true);
     }
-    batteryInstance.charge(updateBatteryState);
+    // batteryInstance.charge(updateBatteryState);
     // Method 2
-    //batteryInstance.charge2(4, updateBatteryState);
+    batteryInstance.charge2(4, updateBatteryState);
   };
 
   const toggleOverNightCharging = () => {
@@ -128,12 +124,12 @@ export default function VehicleView() {
       return;
     }
 
-    const numberOfCells = Math.floor(Number(parsedDistance) / 2); // Calculate cells to discharge
-    console.log(`Starting travel for ${distance} km, discharging ${numberOfCells} cells.`);
-    batteryInstance.discharge(numberOfCells, updateBatteryState); // Call the discharge function
+    // const numberOfCells = Math.floor(Number(parsedDistance) / 2); // Calculate cells to discharge
+    // console.log(`Starting travel for ${distance} km, discharging ${numberOfCells} cells.`);
+    // batteryInstance.discharge(numberOfCells, updateBatteryState); // Call the discharge function
 
     // Implementation 1
-    //batteryInstance.discharge2(parsedDistance, updateBatteryState);
+    batteryInstance.discharge2(parsedDistance, updateBatteryState);
   };
 
   return (
