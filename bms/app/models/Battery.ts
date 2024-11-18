@@ -256,10 +256,7 @@ export class Battery {
               cell.numberOfChargeCycles++;
             }
 
-            // TODO
-            // need to add logic to consider ambient temp
-            // need to pass in which quadrant the sun is, and then add more temp increment for cells in that quadrant
-            // will implement after front end part is completed 
+
             var quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
             console.log("Quadrant " + cell.getQuadrant() + " Temperature is % " + quadTemp)
             cell.temperature = Math.round(cell.temperature + 5 * quadTemp / 100);
@@ -276,12 +273,12 @@ export class Battery {
         this.getCells(totalChargeNeeded);
       }
       console.log(this.calculateIdleCellAvgTemperature());
-      console.log("need: " + totalChargeNeeded + "available: " + this.getTotalAvailabeCharge() + "lenght: " + this.dischargingCells1.length);
-      await this.sleep(200);
+      console.log("Need: " + totalChargeNeeded + "Available: " + this.getTotalAvailabeCharge() + "Cells: " + this.dischargingCells1.length);
+      await this.sleep(500);
 
     }
     this.pushBackIntoHeap();
-    console.log("heaplenght" + this.cellHeap.heap.length)
+    //console.log("heaplenght" + this.cellHeap.heap.length)
   }
 
   public async charge2(numberOfCellsChargedAtATime: number, updateBatteryState: () => void) {
@@ -304,10 +301,10 @@ export class Battery {
         }
       }
       updateBatteryState();
-      await this.sleep(400);
+      await this.sleep(500);
     }
     this.pushBackIntoHeap();
-    console.log("heaplenght" + this.cellHeap.heap.length)
+    //console.log("heaplenght" + this.cellHeap.heap.length)
   }
 
   private pushBackIntoHeap() {
