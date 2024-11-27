@@ -2,83 +2,81 @@
 import { useState, useEffect } from "react";
 import Light from "./Light";
 import InputView from "./InputView";
-import { Battery } from '../models/Battery';
-import { Cell } from '../models/Cell';
+import { Cell } from "../models/Cell";
 import { batteryInstance } from "../models/batterySingleton";
-import GlobalSettings from '../models/GlobalSettings';
+import GlobalSettings from "../models/GlobalSettings";
 import LogOutput from "./LogOutput";
 
 const updateSkipQuadrant1 = (value: boolean) => {
   GlobalSettings.isSkipQuadrant1 = value;
-  console.log("quad 1"+value);// for checking if the value is changing or not
-  
+  console.log("quad 1" + value); // for checking if the value is changing or not
 };
 
 const updateSkipQuadrant2 = (value: boolean) => {
   GlobalSettings.isSkipQuadrant2 = value;
-  console.log("quad 2"+value);// for checking if the value is changing or not
+  console.log("quad 2" + value); // for checking if the value is changing or not
 };
 
 const updateSkipQuadrant3 = (value: boolean) => {
   GlobalSettings.isSkipQuadrant3 = value;
-  console.log("quad 3"+value);// for checking if the value is changing or not
+  console.log("quad 3" + value); // for checking if the value is changing or not
 };
 
 const updateSkipQuadrant4 = (value: boolean) => {
   GlobalSettings.isSkipQuadrant4 = value;
-  console.log("quad 4"+value);// for checking if the value is changing or not
+  console.log("quad 4" + value); // for checking if the value is changing or not
 };
 
 const updateSuperCharged = (value: boolean) => {
   GlobalSettings.isSuperCharged = value;
 };
-//added overnight chanegd 
+//added overnight chanegd
 const updateOverNightCharged = (value: boolean) => {
   GlobalSettings.isSuperCharged = value;
 };
 
 export default function VehicleView() {
-
-  const [selectedTab, setSelectedTab] = useState("distance");
-  const [superChargingOn, setSuperChargingOn] = useState(false);
-  const [overNightChargingOn, setOverNightChargingOn] = useState(false);
-  const [distance, setDistance] = useState(""); // State to hold distance input
-
   const [lightsOn, setLightsOn] = useState<boolean>(false);
-
+  const [q1Temperature, setQ1Temperature] = useState("25"); // Temperature for Q1
+  const [q2Temperature, setQ2Temperature] = useState("25"); // Temperature for Q2
+  const [q3Temperature, setQ3Temperature] = useState("25"); // Temperature for Q3
+  const [q4Temperature, setQ4Temperature] = useState("25"); // Temperature for Q4
+  //Battery Stuff
+  const [battery, setBattery] = useState(batteryInstance);
+  const [overallBatteryLevel, setOverallBatteryLevel] = useState(0);
+  const [travelDistance, setTravelDistance] = useState(0);
   const toggleLights = (): void => {
     setLightsOn(!lightsOn);
   };
 
   const updateQ1Temperature = (value: number) => {
     GlobalSettings.q1temperature = value;
-  } // Temperature for Q1
+  }; // Temperature for Q1
 
   const updateQ2Temperature = (value: number) => {
     GlobalSettings.q2temperature = value;
-  } // Temperature for Q2
+  }; // Temperature for Q2
 
   const updateQ3Temperature = (value: number) => {
     GlobalSettings.q3temperature = value;
-  } // Temperature for Q3
+  }; // Temperature for Q3
 
   const updateQ4Temperature = (value: number) => {
     GlobalSettings.q4temperature = value;
-  } // Temperature for Q4
+  }; // Temperature for Q4
 
-  const [q1Temperature, setQ1Temperature] = useState("30"); // Temperature for Q1
-  const [q2Temperature, setQ2Temperature] = useState("30"); // Temperature for Q2
-  const [q3Temperature, setQ3Temperature] = useState("40"); // Temperature for Q3
-  const [q4Temperature, setQ4Temperature] = useState("60"); // Temperature for Q4
-  updateQ1Temperature(parseFloat(q1Temperature))
-  updateQ2Temperature(parseFloat(q2Temperature))
-  updateQ3Temperature(parseFloat(q3Temperature))
-  updateQ4Temperature(parseFloat(q4Temperature))
-  //Battery Stuff
-  const [battery, setBattery] = useState(batteryInstance);
+  updateQ1Temperature(parseFloat(q1Temperature));
+  updateQ2Temperature(parseFloat(q2Temperature));
+  updateQ3Temperature(parseFloat(q3Temperature));
+  updateQ4Temperature(parseFloat(q4Temperature));
 
   const updateBatteryState = () => {
-    setBattery({ ...batteryInstance }); // Trigger re-render by updating state
+    const currentSOC = batteryInstance.calculateStateOfCharge();
+    const currentTravelDistance = batteryInstance.getCurrentTravelDistance();
+    // Update state to trigger re-render
+    setBattery({ ...batteryInstance }); // Clone batteryInstance to force state update
+    setOverallBatteryLevel(currentSOC);
+    setTravelDistance(currentTravelDistance);
   };
 
   useEffect(() => {
@@ -90,159 +88,138 @@ export default function VehicleView() {
     return () => clearInterval(interval); // Cleanup interval when component unmounts
   }, [battery]);
 
-  const toggleSuperCharging = () => {
-    console.log('Starting Supercharging');
-    if (superChargingOn) {
-      setSuperChargingOn(false);
-      updateSuperCharged(false);
-    }
-    else {
-      setSuperChargingOn(true);
-      updateSuperCharged(true);
-    }
-    // batteryInstance.charge(updateBatteryState);
-    // Method 2
-    batteryInstance.charge2(4, updateBatteryState);
-  };
-
-  const toggleOverNightCharging = () => {
-    console.log('Starting Overnightcharging');
-    if (overNightChargingOn) {
-      setOverNightChargingOn(false);
-    }
-    else {
-      setOverNightChargingOn(true);
-    }
-    batteryInstance.charge(updateBatteryState);
-  };
-
-  const handleStart = () => {
-
-    const parsedDistance = parseFloat(distance); // Convert distance to a number
-    if (isNaN(parsedDistance)) {
-      console.error("Please enter a valid number for distance.");
-      return;
-    }
-
-    // const numberOfCells = Math.floor(Number(parsedDistance) / 2); // Calculate cells to discharge
-    // console.log(`Starting travel for ${distance} km, discharging ${numberOfCells} cells.`);
-    // batteryInstance.discharge(numberOfCells, updateBatteryState); // Call the discharge function
-
-    // Implementation 1
-    batteryInstance.discharge2(parsedDistance, updateBatteryState);
-  };
-
   return (
-    <div className="vehicle-container">
-      <div className="flex flex-col items-center w-[6%] absolute top-[3rem] left-[22rem]">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={q1Temperature}
-          onChange={(e) => {
-            setQ1Temperature(e.target.value); // Update the state with a number
-            updateQ1Temperature(parseFloat(e.target.value)); // Pass the number to the function
-          }}
-          className="w-30"
-        />
-        <span className="mt-2">{q1Temperature}°C</span>{" "}
-        {/* Temperature display above the slider Q1*/}
-      </div>
-      <div className="flex flex-col items-center w-[6%] absolute top-[3rem] left-[37rem]">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={q2Temperature}
-          onChange={(e) => {
-            setQ2Temperature(e.target.value); // Update the state with a number
-            updateQ2Temperature(parseFloat(e.target.value)); // Pass the number to the function
-          }}
-          className="w-30"
-        />
-        <span className="mt-2">{q2Temperature}°C</span>{" "}
-        {/* Temperature display above the slider Q2*/}
-      </div>
-      <div className="vehicle-body">
+    <div className="-z-10 flex h-[calc(100vh_-_30px)] items-center justify-start bg-[#f0f0f0] px-4 py-[10%]">
+      <div className="relative top-[-40px] z-[8] flex h-[500px] w-[84%] flex-row items-center rounded-[50px] bg-[#cccccc] shadow-[0_4px_8px_rgba(0,_0,_0,_0.2)]">
+        <div className="absolute left-[46%] top-[-30px] mb-2 flex -translate-x-[40%] flex-row space-x-3">
+          <p>Overall Battery Level: {overallBatteryLevel.toFixed(1)}%</p>
+          <p>Available Travel Distance: {travelDistance.toFixed(1)} km</p>
+        </div>
         {/* Engine Section */}
-        <div className="vehicle-section engine">
-          <div className="wheel wheel-left"></div>Engine
-          <div className="wheel wheel-right"></div>
+        <div className="engine relative flex h-full flex-[0.2] items-center justify-center rounded-bl-[50px] rounded-tl-[50px] bg-[#a0a0a0] text-center text-[1.2em] font-bold text-white [text-orientation:upright] [writing-mode:vertical-rl]">
+          <div className="wheel absolute right-[-40%] top-[-9%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] bg-[#333] shadow-[0px_4px_8px_rgba(0,_0,_0,_0.4)]"></div>
+          Engine
+          <div className="wheel absolute bottom-[-9%] right-[-40%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] bg-[#333] shadow-[0px_4px_8px_rgba(0,_0,_0,_0.4)]"></div>
         </div>
 
         {/* Battery Section */}
-        <div className="vehicle-section battery">
-          <div className="grid gap-5 z-10">
-          <button
-            onClick={() => updateSkipQuadrant2(!GlobalSettings.isSkipQuadrant2)}
-            className="sun-button absolute top-[5%] right-[+30px] text-3xl"
-            title="Toggle Quadrant 2"
-          >
-            {GlobalSettings.isSkipQuadrant2 ? "☀️": "⛅"}
-          </button>
-          <button
-            onClick={() => updateSkipQuadrant4(!GlobalSettings.isSkipQuadrant4)}
-            className="sun-button absolute bottom-[10px] left-[+30px] text-3xl"
-            title="Toggle Quadrant 4"
-          >
-            {GlobalSettings.isSkipQuadrant4 ? "☀️": "⛅"}
-          </button>
-          <button
-            onClick={() => updateSkipQuadrant1(!GlobalSettings.isSkipQuadrant1)}
-            className="sun-button absolute top-[10px] left-[+30px] text-3xl"
-            title="Toggle Quadrant 1"
-          >
-            {GlobalSettings.isSkipQuadrant1 ? "☀️": "⛅"}
-          </button>
-          <button
-            onClick={() => updateSkipQuadrant3(!GlobalSettings.isSkipQuadrant3)}
-            className="sun-button absolute bottom-[10px] right-[+30px] text-3xl"
-            title="Toggle Quadrant 3"
-          >
-            {GlobalSettings.isSkipQuadrant3 ? "☀️": "⛅"}
-          </button>
+        <div className="battery relative flex flex-[0.8] items-center justify-center bg-[#b0b0b0] p-[10px] text-center text-[1.2em] font-bold text-white">
+          <div className="z-10 grid gap-5">
+            <div className="absolute right-[30px] top-[5%] flex w-[6%] flex-col items-center">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={q2Temperature}
+                onChange={(e) => {
+                  setQ2Temperature(e.target.value); // Update the state with a number
+                  updateQ2Temperature(parseFloat(e.target.value)); // Pass the number to the function
+                }}
+                className="w-30"
+              />
+              <span className="mt-2">{q2Temperature}°C</span>{" "}
+              {/* Temperature display above the slider Q2*/}
+            </div>
+            <div className="absolute left-[30px] top-[5%] z-50 flex w-[6%] flex-col items-center">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={q1Temperature}
+                onChange={(e) => {
+                  setQ1Temperature(e.target.value); // Update the state with a number
+                  updateQ1Temperature(parseFloat(e.target.value)); // Pass the number to the function
+                }}
+                className="w-30"
+              />
+              <span className="mt-2">{q1Temperature}°C</span>{" "}
+              {/* Temperature display above the slider Q1*/}
+            </div>
+            <div className="absolute bottom-[5%] left-[30px] flex w-[6%] flex-col items-center">
+              <span className="mt-2">{q3Temperature}°C</span>{" "}
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={q3Temperature}
+                onChange={(e) => {
+                  setQ3Temperature(e.target.value); // Update the state with a number
+                  updateQ3Temperature(parseFloat(e.target.value)); // Pass the number to the function
+                }}
+                className="w-30"
+              />
+              {/* Temperature display above the slider Q3*/}
+            </div>
+            <div className="absolute bottom-[5%] right-[30px] z-50 flex w-[6%] flex-col items-center">
+              <span className="mt-2">{q4Temperature}°C</span>{" "}
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={q4Temperature}
+                onChange={(e) => {
+                  setQ4Temperature(e.target.value); // Update the state with a number
+                  updateQ4Temperature(parseFloat(e.target.value)); // Pass the number to the function
+                }}
+                className="w-30"
+              />
+              {/* Temperature display above the slider Q4*/}
+            </div>
             {battery.battery.map((cell: Cell, index: number) => {
-
               const charge = cell.stateOfCharge; // Generate random charge for each battery cell
               const chargeColor = cell.getCellChargeColor(); // Get color based on charge
-
-
+              // Determine the box shadow color based on the temperature
+              const boxShadowColor =
+                cell.temperature <= 25
+                  ? "0 0 5px 5px rgba(0, 255, 0, 0.6)" // Green for cool temperature (<= 25°C)
+                  : cell.temperature <= 29
+                    ? "0 0 5px 5px rgba(255, 255, 0, 0.6)" // Yellow for moderate temperature (26°C - 29°C)
+                    : cell.temperature <= 34
+                      ? "0 0 5px 5px rgba(255, 165, 0, 0.6)" // Orange for hot temperature (29°C - 34°C)
+                      : "0 0 5px 5px rgba(255, 0, 0, 0.6)"; // Red for extremely hot temperature (> 34°C)
               return (
                 <div
                   key={cell.cellId}
-                  className={`battery-icon_wrapper lvl${cell.cellId} relative w-[34px] h-[30px] border-2 ${charge === 0 ? "border-[#FF4C4C]" : "border-[#333]"
-                    } rounded-md group m-[5px]`}
+                  className={`battery-icon_wrapper lvl${
+                    cell.cellId
+                  } relative h-[30px] w-[34px] border-2 ${
+                    charge === 0 ? "border-[#FF4C4C]" : "border-[#333]"
+                  } group m-[5px] rounded-md`}
                   style={{
-                    boxShadow: cell.temperature > 80
-                      ? '0 0 5px 5px rgba(255, 0, 0, 0.6)' // Red glow for high temperature
-                      : cell.temperature == 25
-                        ? '0 0 5px 5px rgba(0, 255, 0, 0.6)' // Green glow for low temperature
-                        : '0 0 5px 5px rgba(255, 255, 0, 0.6)', // Yellow glow for moderate temperature
+                    boxShadow: boxShadowColor,
                   }}
                 >
                   {/* White top indicator */}
-                  <div className="absolute top-[-5px] left-1/2 transform -translate-x-1/2 bg-white rounded-[6px] w-[12px] h-[3px]" />
+                  <div className="absolute left-1/2 top-[-5px] h-[3px] w-[12px] -translate-x-1/2 transform rounded-[6px] bg-white" />
 
-                  <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs text-white font-semibold z-10  ">
+                  <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transform text-xs font-semibold text-white">
                     {charge}%
                   </span>
                   {/* Inner fill based on charge level */}
                   <div
-                    className={`absolute bottom-0 w-full ${chargeColor} rounded-b-md ${charge > 94 ? "rounded-t-md" : ""
-                      }`}
+                    className={`absolute bottom-0 w-full ${chargeColor} rounded-b-md ${
+                      charge > 94 ? "rounded-t-md" : ""
+                    }`}
                     style={{ height: `${charge}%` }}
                   ></div>
 
                   {/* Tooltip for showing details on hover */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 w-max bg-gray-700 text-white text-sm rounded py-1 px-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none z-50">
-                    Cell ID: {cell.cellId}<br />
-                    Temperature: {cell.temperature}°C<br />
+                  <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 w-max -translate-x-1/2 transform rounded bg-gray-700 px-2 py-1 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    Cell ID: {cell.cellId}
+                    <br />
+                    Temperature: {cell.temperature}°C
+                    <br />
                     State of Charge: {cell.stateOfCharge}%<br />
                     Voltage: {cell.voltage}V<br />
-                    Quadrant: {cell.quadrant}<br />
-                    Cycles: {cell.numberOfChargeCycles} <br/>
-                    Charging Status: {cell.chargingStatus === 'C' ? 'Charging' : cell.chargingStatus === 'D' ? 'Discharging' : 'Idle'}
+                    Quadrant: {cell.quadrant}
+                    <br />
+                    Cycles: {cell.numberOfChargeCycles} <br />
+                    Charging Status:{" "}
+                    {cell.chargingStatus === "C"
+                      ? "Charging"
+                      : cell.chargingStatus === "D"
+                        ? "Discharging"
+                        : "Idle"}
                   </div>
                 </div>
               );
@@ -251,121 +228,31 @@ export default function VehicleView() {
         </div>
 
         {/* Baggage Section */}
-        <div className="vehicle-section baggage">
-          <div className="wheel wheel-rear-left"></div>Baggage
-          <div className="wheel wheel-rear-right"></div>
+        <div className="baggage relative flex h-full flex-[0.2] items-center justify-center rounded-br-[50px] rounded-tr-[50px] bg-[#a0a0a0] text-center text-[1.2em] font-bold text-white [text-orientation:upright] [writing-mode:vertical-rl]">
+          <div className="wheel absolute left-[-40%] top-[-9%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] bg-[#333] shadow-[0px_4px_8px_rgba(0,_0,_0,_0.4)]"></div>
+          Baggage
+          <div className="wheel absolute bottom-[-9%] left-[-40%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] bg-[#333] shadow-[0px_4px_8px_rgba(0,_0,_0,_0.4)]"></div>
         </div>
         {/* Front and Back Labels */}
-        <div className="front-label">Front</div>
-        <div className="back-label">Rear</div>
+        <div className="absolute left-[4px] top-[40%] rounded-[3px] bg-[rgba(255,_255,_255,_0.8)] p-[2px_5px] text-[0.8em] text-[#333] [text-orientation:upright] [writing-mode:vertical-rl]">
+          Front
+        </div>
+        <div className="absolute right-[4px] top-[43%] rounded-[3px] bg-[rgba(255,_255,_255,_0.8)] p-[2px_5px] text-[0.8em] text-[#333] [text-orientation:upright] [writing-mode:vertical-rl]">
+          Rear
+        </div>
 
         <Light position="front-left" isOn={lightsOn} />
         <Light position="front-right" isOn={lightsOn} />
         <Light position="rear-left" isOn={lightsOn} />
         <Light position="rear-right" isOn={lightsOn} />
       </div>
-      <div className="flex flex-col items-center w-[6%] absolute bottom-[4rem] left-[22rem] z-50">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={q3Temperature}
-          onChange={(e) => {
-            setQ3Temperature(e.target.value); // Update the state with a number
-            updateQ3Temperature(parseFloat(e.target.value)); // Pass the number to the function
-          }}
-          className="w-30"
-        />
-        <span className="mt-2">{q3Temperature}°C</span>{" "}
-        {/* Temperature display above the slider Q2*/}
+
+      <div className="absolute bottom-0 left-[40%] mb-2 -translate-x-[40%]">
+        <InputView updateBatteryState={updateBatteryState} />
       </div>
-      <div className="flex flex-col items-center w-[6%] absolute bottom-[4rem] left-[37rem] z-50">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={q4Temperature}
-          onChange={(e) => {
-            setQ4Temperature(e.target.value); // Update the state with a number
-            updateQ4Temperature(parseFloat(e.target.value)); // Pass the number to the function
-          }}
-          className="w-30"
-        />
-        <span className="mt-2">{q4Temperature}°C</span>{" "}
-        {/* Temperature display above the slider Q2*/}
-      </div>
+
+      {/* Log Output */}
       <LogOutput />
-      <div className="inputsection absolute bottom-0 py-1">
-        {/* Tabs */}
-
-        <div className="tabs flex space-x-2 px-2 py-1 bg-gray-200 border-t border-gray-300 rounded-t-md mt-8 ">
-          <button
-            onClick={() => setSelectedTab("distance")}
-            className={`tab-button px-4 py-2 font-semibold rounded-md ${selectedTab === "distance"
-              ? "bg-blue-500 text-white"
-              : "bg-white text-gray-800"
-              } hover:bg-blue-400 transition duration-200`}
-          >
-            Plan your travel
-          </button>
-          <button
-            onClick={() => setSelectedTab("charging")}
-            className={`tab-button px-4 py-2 font-semibold rounded-md ${selectedTab === "charging"
-              ? "bg-blue-500 text-white"
-              : "bg-white text-gray-800"
-              } hover:bg-blue-400 transition duration-200`}
-          >
-            Park your vehicle
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        <div className="tab-content w-full px-4 bg-gray-100 border border-t-0 border-gray-300 rounded-b-md">
-          {selectedTab === "distance" && (
-            <div className="distance-tab">
-              <span>Enter distance to travel (km)</span>
-              <div className="flex items-center mb-2 space-x-2">
-                <input
-                  type="text"
-                  value={distance}
-                  onChange={(e) => setDistance(e.target.value)}
-                  className="p-2 border border-gray-300 rounded-md  max-w-xs focus:outline-none focus:ring focus:ring-blue-500 h-10"
-                />
-                <button
-                  onClick={handleStart}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 h-10"
-                >
-                  Start Travel
-                </button>
-              </div>
-            </div>
-          )}
-          {selectedTab === "charging" && (
-            <div className="charging-tab">
-              <div className="flex items-center justify-center py-2">
-                <button
-                  onClick={toggleSuperCharging}
-                  className={`px-4 py-2 rounded-md ${superChargingOn
-                    ? "bg-red-500 text-white"
-                    : "bg-green-300 text-gray-700"
-                    } transition duration-200`}
-                >
-                  {superChargingOn ? "Stop Charging" : "Super Charge"}
-                </button>
-                <button
-                  onClick={toggleOverNightCharging}
-                  className={`px-4 py-2 rounded-md ${overNightChargingOn
-                    ? "bg-red-500 text-white"
-                    : "bg-green-300 text-gray-700"
-                    } transition duration-200`}
-                >
-                  {overNightChargingOn ? "Stop Charging" : "Over Night"}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
