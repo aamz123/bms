@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const LogOutput = () => {
+const LogOutput = ({theme}:{theme:boolean}) => {
   const [logs, setLogs] = useState<{ text: string; style: string }[]>([]);
   const logContainerRef = useRef<HTMLDivElement>(null); // Reference to the log container for scrolling
 
@@ -53,9 +53,19 @@ const LogOutput = () => {
   return (
     <div
       ref={logContainerRef}
-      className="fixed right-0 top-[30px] z-[10] h-[calc(100vh_-_30px)] w-[25%] overflow-y-auto rounded-lg border border-gray-300 bg-white/10 text-left font-medium shadow-lg backdrop-opacity-90"
+      className={`fixed right-0 top-[30px] z-[10] h-[calc(100vh_-_30px)] w-[25%] overflow-y-auto rounded-lg border ${
+        theme
+          ? "border-gray-600 bg-[#1e1e1e38] text-white"
+          : "border-b-[#12121213] bg-[##cbd5e1] text-black"
+      } font-medium shadow-lg backdrop-opacity-90`}
+      
     >
-      <h2 className="sticky top-0 w-full border-b-2 border-b-[#cccccc] bg-[#f0f0f0] text-center text-lg font-bold">
+      <h2 className={`sticky top-0 w-full border-b-2 text-center text-lg font-bold ${
+  theme
+    ? "border-b-[#444] bg-[#2e2e2eb7] text-white"
+    : "border-b-[#1212123b] bg-[#fafafa8c] text-black"
+}`}
+>
         Console Output
       </h2>
       <div className="logs pt-2">

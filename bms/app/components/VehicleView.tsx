@@ -7,6 +7,8 @@ import { batteryInstance } from "../models/batterySingleton";
 import GlobalSettings from "../models/GlobalSettings";
 import LogOutput from "./LogOutput";
 
+
+
 const updateSkipQuadrant1 = (value: boolean) => {
   GlobalSettings.isSkipQuadrant1 = value;
   console.log("quad 1" + value); // for checking if the value is changing or not
@@ -35,7 +37,8 @@ const updateOverNightCharged = (value: boolean) => {
   GlobalSettings.isSuperCharged = value;
 };
 
-export default function VehicleView() {
+export default function VehicleView({theme}:{theme:boolean}) {
+ 
   const [lightsOn, setLightsOn] = useState<boolean>(false);
   const [q1Temperature, setQ1Temperature] = useState("25"); // Temperature for Q1
   const [q2Temperature, setQ2Temperature] = useState("25"); // Temperature for Q2
@@ -89,17 +92,37 @@ export default function VehicleView() {
   }, [battery]);
 
   return (
-    <div className="-z-10 flex h-[calc(100vh_-_30px)] items-center justify-start bg-[#f0f0f0] px-4 py-[10%]">
-      <div className="relative top-[-40px] z-[8] flex h-[500px] w-[84%] flex-row items-center rounded-[50px] bg-[#cccccc] shadow-[0_4px_8px_rgba(0,_0,_0,_0.2)]">
-        <div className="absolute left-[46%] top-[-30px] mb-2 flex -translate-x-[40%] flex-row space-x-3">
+    <div
+
+    className={`flex h-[calc(100vh_-_30px)] items-center justify-start px-4 py-[10%] ${
+      theme ? "bg-[#121212d5] text-white" : "bg-[#f0f0f0] text-black"
+    }`}
+  >
+
+    
+<div
+        className={`relative z-[8] flex h-[500px] w-[84%] flex-row items-center rounded-[50px] shadow-[0_4px_8px_rgba(0,_0,_0,_0.2)] ${
+          theme ? "bg-[#666666]" : "bg-[#cccccc]"
+        }`}
+      >        <div className="absolute left-[46%] top-[-30px] mb-2 flex -translate-x-[40%] flex-row space-x-3">
           <p>Overall Battery Level: {overallBatteryLevel.toFixed(1)}%</p>
           <p>Available Travel Distance: {travelDistance.toFixed(1)} km</p>
         </div>
         {/* Engine Section */}
         <div className="engine relative flex h-full flex-[0.2] items-center justify-center rounded-bl-[50px] rounded-tl-[50px] bg-[#a0a0a0] text-center text-[1.2em] font-bold text-white [text-orientation:upright] [writing-mode:vertical-rl]">
-          <div className="wheel absolute right-[-40%] top-[-9%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] bg-[#333] shadow-[0px_4px_8px_rgba(0,_0,_0,_0.4)]"></div>
+        <div
+  className={`wheel absolute right-[-40%] top-[-9%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] ${
+    theme ? 'bg-[#e2e8f0] text-black' : 'bg-[#333] text-white'
+  } shadow-[0px_4px_8px_rgba(0,_0,_0,_0.9)]`}
+></div>
           Engine
-          <div className="wheel absolute bottom-[-9%] right-[-40%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] bg-[#333] shadow-[0px_4px_8px_rgba(0,_0,_0,_0.4)]"></div>
+          <div
+  className={`wheel absolute bottom-[-9%] right-[-40%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] ${
+    theme ? 'bg-[#e2e8f0] text-black' : 'bg-[#333] text-white'
+  } shadow-[0px_4px_8px_rgba(0,_0,_0,_0.9)]`}
+></div>
+
+
         </div>
 
         {/* Battery Section */}
@@ -229,15 +252,24 @@ export default function VehicleView() {
 
         {/* Baggage Section */}
         <div className="baggage relative flex h-full flex-[0.2] items-center justify-center rounded-br-[50px] rounded-tr-[50px] bg-[#a0a0a0] text-center text-[1.2em] font-bold text-white [text-orientation:upright] [writing-mode:vertical-rl]">
-          <div className="wheel absolute left-[-40%] top-[-9%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] bg-[#333] shadow-[0px_4px_8px_rgba(0,_0,_0,_0.4)]"></div>
+        <div
+  className={`wheel absolute left-[-40%] top-[-9%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] ${
+    theme ? 'bg-[#e2e8f0] text-black' : 'bg-[#333] text-white'
+  } shadow-[0px_4px_8px_rgba(0,_0,_0,_0.9)]`}
+></div>
+
           Baggage
-          <div className="wheel absolute bottom-[-9%] left-[-40%] z-[-5] flex h-[80px] w-[140px] items-center justify-center rounded-[50%] bg-[#333] shadow-[0px_4px_8px_rgba(0,_0,_0,_0.4)]"></div>
+          <div
+  className={`wheel absolute bottom-[-9%] left-[-40%] z-[-5]  flex h-[80px] w-[140px] items-center justify-center rounded-[50%] ${
+    theme ? 'bg-[#e2e8f0] text-black' : 'bg-[#333] text-black'
+  } shadow-[0px_4px_8px_rgba(0,_0,_0,_0.9)]`}
+></div>
         </div>
         {/* Front and Back Labels */}
-        <div className="absolute left-[4px] top-[40%] rounded-[3px] bg-[rgba(255,_255,_255,_0.8)] p-[2px_5px] text-[0.8em] text-[#333] [text-orientation:upright] [writing-mode:vertical-rl]">
+        <div className="absolute left-[4px] top-[40%] rounded-[3px] bg-[#e2e8f0] p-[2px_5px] text-[0.8em] text-[#333] [text-orientation:upright] [writing-mode:vertical-rl]">
           Front
         </div>
-        <div className="absolute right-[4px] top-[43%] rounded-[3px] bg-[rgba(255,_255,_255,_0.8)] p-[2px_5px] text-[0.8em] text-[#333] [text-orientation:upright] [writing-mode:vertical-rl]">
+        <div className="absolute right-[4px] top-[43%] rounded-[3px] bg-[#e2e8f0] p-[2px_5px] text-[0.8em] text-[#333] [text-orientation:upright] [writing-mode:vertical-rl]">
           Rear
         </div>
 
@@ -248,11 +280,11 @@ export default function VehicleView() {
       </div>
 
       <div className="absolute bottom-0 left-[40%] mb-2 -translate-x-[40%]">
-        <InputView updateBatteryState={updateBatteryState} />
+        <InputView theme={theme}updateBatteryState={updateBatteryState} />
       </div>
 
       {/* Log Output */}
-      <LogOutput />
+      <LogOutput theme={theme} />
     </div>
   );
 }
