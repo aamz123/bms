@@ -77,17 +77,16 @@ export default function InputView({
   };
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const maxDistance = batteryInstance.getCurrentTravelDistance();
-    const sanitizedValue = sanitizeIntegerInput(
-      event.target.value,
-      maxDistance,
-    );
+    const sanitizedValue = parseInt(
+      sanitizeIntegerInput(event.target.value, maxDistance),
+    ).toFixed(0);
     setDistance(sanitizedValue);
   };
   const stopTravel = (stopType: string) => {
-    let parsedDistance = parseFloat(distance);
+    const parsedDistance = parseFloat(distance);
     if (stopType === "early") {
-      let remainingDistance =
-        parsedDistance - batteryInstance.distanceTravelled;
+      const remainingDistance =
+        parsedDistance - batteryInstance.distanceTravelled - 1;
       batteryInstance.cancelTravel();
       console.log(
         `%cINFO: Travel stopped early at ${batteryInstance.distanceTravelled.toFixed(1)} km.`,
@@ -129,7 +128,7 @@ export default function InputView({
     if (isTravelling) {
       return;
     }
-    let parsedDistance = parseFloat(distance);
+    const parsedDistance = parseFloat(distance);
     console.log(
       `%cINFO: Starting travel for ${parsedDistance} km.`,
       "color: green; font-weight: bold;",

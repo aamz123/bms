@@ -7,33 +7,33 @@ import { batteryInstance } from "../models/batterySingleton";
 import GlobalSettings from "../models/GlobalSettings";
 import LogOutput from "./LogOutput";
 import TravelDistanceGauge from "./TravelDistanceGauge";
-const updateSkipQuadrant1 = (value: boolean) => {
-  GlobalSettings.isSkipQuadrant1 = value;
-  console.log("quad 1" + value); // for checking if the value is changing or not
-};
+// const updateSkipQuadrant1 = (value: boolean) => {
+//   GlobalSettings.isSkipQuadrant1 = value;
+//   console.log("quad 1" + value); // for checking if the value is changing or not
+// };
 
-const updateSkipQuadrant2 = (value: boolean) => {
-  GlobalSettings.isSkipQuadrant2 = value;
-  console.log("quad 2" + value); // for checking if the value is changing or not
-};
+// const updateSkipQuadrant2 = (value: boolean) => {
+//   GlobalSettings.isSkipQuadrant2 = value;
+//   console.log("quad 2" + value); // for checking if the value is changing or not
+// };
 
-const updateSkipQuadrant3 = (value: boolean) => {
-  GlobalSettings.isSkipQuadrant3 = value;
-  console.log("quad 3" + value); // for checking if the value is changing or not
-};
+// const updateSkipQuadrant3 = (value: boolean) => {
+//   GlobalSettings.isSkipQuadrant3 = value;
+//   console.log("quad 3" + value); // for checking if the value is changing or not
+// };
 
-const updateSkipQuadrant4 = (value: boolean) => {
-  GlobalSettings.isSkipQuadrant4 = value;
-  console.log("quad 4" + value); // for checking if the value is changing or not
-};
+// const updateSkipQuadrant4 = (value: boolean) => {
+//   GlobalSettings.isSkipQuadrant4 = value;
+//   console.log("quad 4" + value); // for checking if the value is changing or not
+// };
 
-const updateSuperCharged = (value: boolean) => {
-  GlobalSettings.isSuperCharged = value;
-};
-//added overnight chanegd
-const updateOverNightCharged = (value: boolean) => {
-  GlobalSettings.isSuperCharged = value;
-};
+// const updateSuperCharged = (value: boolean) => {
+//   GlobalSettings.isSuperCharged = value;
+// };
+// //added overnight chanegd
+// const updateOverNightCharged = (value: boolean) => {
+//   GlobalSettings.isSuperCharged = value;
+// };
 
 export default function VehicleView({ theme }: { theme: boolean }) {
   const [isTravelling, setIsTravelling] = useState(false);
@@ -72,7 +72,8 @@ export default function VehicleView({ theme }: { theme: boolean }) {
     const currentSOC = batteryInstance.calculateStateOfCharge();
     const currentTravelDistance = batteryInstance.getCurrentTravelDistance();
     // Update state to trigger re-render
-    setBattery({ ...batteryInstance }); // Clone batteryInstance to force state update
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    setBattery({ ...(batteryInstance as any) }); // Clone batteryInstance to force state update
     setOverallBatteryLevel(currentSOC);
     setTravelDistance(currentTravelDistance);
   };
@@ -221,7 +222,7 @@ export default function VehicleView({ theme }: { theme: boolean }) {
               />
               {/* Temperature display above the slider Q4*/}
             </div>
-            {battery.battery.map((cell: Cell, index: number) => {
+            {battery.battery.map((cell: Cell) => {
               const charge = cell.stateOfCharge; // Generate random charge for each battery cell
               const chargeColor = cell.getCellChargeColor(); // Get color based on charge
               // Determine the box shadow color based on the temperature

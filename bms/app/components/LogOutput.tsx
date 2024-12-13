@@ -6,7 +6,7 @@ const LogOutput = ({ theme }: { theme: boolean }) => {
 
   useEffect(() => {
     const originalConsoleLog = console.log;
-
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     console.log = (...args: any[]) => {
       const styledLogs: { text: string; style: string }[] = [];
       let i = 0;
@@ -85,7 +85,7 @@ const LogOutput = ({ theme }: { theme: boolean }) => {
 
 // Utility to convert CSS style strings into style objects
 const parseStyle = (styleString: string): React.CSSProperties => {
-  const styles: React.CSSProperties = {};
+  const styles: Record<string, string> = {};
   styleString.split(";").forEach((style) => {
     const [key, value] = style.split(":").map((s) => s.trim());
     if (key && value) {

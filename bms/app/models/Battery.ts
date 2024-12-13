@@ -14,6 +14,7 @@ export class Battery {
   dischargeQueue: DoublyLinkedList; //Queue if we are following approach 2.
   dischargedCells: number[];
   chargingQueue: number[];
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   observers: Function[] = [];
   cellHeap: MaxHeap<Cell>;
   dischargingCells1: Cell[] = [];
@@ -49,6 +50,7 @@ export class Battery {
   }
 
   // Method to add observers
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   addObserver(observer: Function) {
     this.observers.push(observer);
   }
@@ -262,7 +264,7 @@ export class Battery {
   ): Promise<void> {
     this.travelCancelled = false; // reset flag
     this.calculateDischargingBAC();
-    var totalChargeNeeded = distance * 20; // total charge percent of needed
+    let totalChargeNeeded = distance * 20; // total charge percent of needed
     //this.totalChargeAvailable = 0;
     this.getCells(totalChargeNeeded);
 
@@ -293,7 +295,7 @@ export class Battery {
               cell.numberOfChargeCycles++;
             }
 
-            var quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
+            const quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
             // {
             //   /*console.log(
             //   `%cINFO: Quadrant ${cell.getQuadrant()} temperature is ${quadTemp}`,
@@ -343,11 +345,11 @@ export class Battery {
     while (!this.chargeCancelled && this.calculateStateOfCharge() != 100) {
       this.getChargingCells(numberOfCellsChargedAtATime);
       for (let i = 0; i < this.chargingCells1.length; i++) {
-        var cell = this.chargingCells1[i];
+        const cell = this.chargingCells1[i];
         cell.chargingStatus = "C";
         if (cell.stateOfCharge < 100) {
           cell.stateOfCharge = Math.min(100, cell.stateOfCharge + 10);
-          var quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
+          const quadTemp = GlobalSettings.getQuadrantTemp(cell.getQuadrant());
           cell.temperature = Math.round(
             cell.temperature + (5 * quadTemp) / 100,
           );
@@ -382,7 +384,9 @@ export class Battery {
   private pushBackIntoHeap() {
     this.dischargingCells1.forEach((cell) => {
       cell.chargingStatus = "I";
-      var index = this.cellHeap.heap.findIndex((c) => c.cellId == cell.cellId);
+      const index = this.cellHeap.heap.findIndex(
+        (c) => c.cellId == cell.cellId,
+      );
       if (index == -1) {
         this.cellHeap.insert(cell);
       } else {
@@ -393,7 +397,9 @@ export class Battery {
 
     this.chargingCells1.forEach((cell) => {
       cell.chargingStatus = "I";
-      var index = this.cellHeap.heap.findIndex((c) => c.cellId == cell.cellId);
+      const index = this.cellHeap.heap.findIndex(
+        (c) => c.cellId == cell.cellId,
+      );
       if (index == -1) {
         this.cellHeap.insert(cell);
       } else {
@@ -419,7 +425,7 @@ export class Battery {
 
   private getCells(totalChargeNeeded: number) {
     while (this.getTotalAvailabeCharge() < totalChargeNeeded) {
-      var cell = this.cellHeap.extractMax();
+      const cell = this.cellHeap.extractMax();
       if (cell) {
         this.dischargingCells1.push(cell);
       }
@@ -427,7 +433,7 @@ export class Battery {
   }
 
   private getTotalAvailabeCharge(): number {
-    var totalAvailable = 0;
+    let totalAvailable = 0;
     this.dischargingCells1.forEach((cell) => {
       totalAvailable += cell.stateOfCharge;
     });
@@ -435,8 +441,8 @@ export class Battery {
   }
 
   private getChargingCells(maxCellCount: number) {
-    for (var i = 0; i < maxCellCount; i++) {
-      var cell = this.cellHeap.extractMax();
+    for (let i = 0; i < maxCellCount; i++) {
+      const cell = this.cellHeap.extractMax();
       if (cell) {
         this.chargingCells1.push(cell);
       }
@@ -464,6 +470,7 @@ export class Battery {
         }
       }
     }, 4000);
+    return reduceTemp;
   }
 
   getQuadrant(cellId: number): number {
