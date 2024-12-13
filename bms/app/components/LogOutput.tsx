@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const LogOutput = ({theme}:{theme:boolean}) => {
+const LogOutput = ({ theme }: { theme: boolean }) => {
   const [logs, setLogs] = useState<{ text: string; style: string }[]>([]);
   const logContainerRef = useRef<HTMLDivElement>(null); // Reference to the log container for scrolling
 
@@ -58,14 +58,14 @@ const LogOutput = ({theme}:{theme:boolean}) => {
           ? "border-gray-600 bg-[#1e1e1e38] text-white"
           : "border-b-[#12121213] bg-[##cbd5e1] text-black"
       } font-medium shadow-lg backdrop-opacity-90`}
-      
     >
-      <h2 className={`sticky top-0 w-full border-b-2 text-center text-lg font-bold ${
-  theme
-    ? "border-b-[#444] bg-[#2e2e2eb7] text-white"
-    : "border-b-[#1212123b] bg-[#fafafa8c] text-black"
-}`}
->
+      <h2
+        className={`sticky top-0 w-full border-b-2 text-center text-lg font-bold ${
+          theme
+            ? "border-b-[#444] bg-[#666666] text-white"
+            : "border-b-[#1212123b] bg-[#cccccc] text-black"
+        }`}
+      >
         Console Output
       </h2>
       <div className="logs pt-2">

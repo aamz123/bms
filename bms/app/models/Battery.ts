@@ -18,6 +18,9 @@ export class Battery {
   cellHeap: MaxHeap<Cell>;
   dischargingCells1: Cell[] = [];
   chargingCells1: Cell[] = [];
+  travelCancelled: boolean = false; // new flag to track travel cancellation
+  distanceTravelled: number = 0;
+  chargeCancelled: boolean = false;
   //totalChargeAvailable = 0;
 
   constructor() {
@@ -255,14 +258,26 @@ export class Battery {
   public async discharge2(
     distance: number,
     updateBatteryState: () => void,
+    stopTravel: (stopType: string) => void,
   ): Promise<void> {
+    this.travelCancelled = false; // reset flag
     this.calculateDischargingBAC();
     var totalChargeNeeded = distance * 20; // total charge percent of needed
     //this.totalChargeAvailable = 0;
     this.getCells(totalChargeNeeded);
 
     while (totalChargeNeeded > 0) {
-      // const dischargeInterval = setInterval(() => {
+      if (this.travelCancelled) {
+        console.log(
+          "%cINFO: Travel cancelled.",
+          "color: red; font-weight: bold;",
+        );
+        updateBatteryState();
+        this.pushBackIntoHeap();
+        this.distanceTravelled = 0;
+        return;
+      }
+
       if (this.getTotalAvailabeCharge() >= totalChargeNeeded) {
         // start discharging
         for (let i = 0; i < this.dischargingCells1.length; i++) {
@@ -273,6 +288,7 @@ export class Battery {
             // Reduce state of charge by 10%
             cell.stateOfCharge = Math.max(0, cell.stateOfCharge - 10);
             totalChargeNeeded = Math.max(0, totalChargeNeeded - 10);
+            this.distanceTravelled += distance / ((distance * 20) / 10);
             if (cell.stateOfCharge == 0 || cell.stateOfCharge == 50) {
               cell.numberOfChargeCycles++;
             }
@@ -301,7 +317,7 @@ export class Battery {
       }
       console.log(
         `%cINFO: Idle Cell Average Temperature: ${this.calculateIdleCellAvgTemperature()}`,
-        "color: gray;",
+        "color: blue;",
       );
       console.log(
         `%cINFO: Need: ${totalChargeNeeded}%, Available: ${this.getTotalAvailabeCharge()}%, Cells: ${this.dischargingCells1.length}`,
@@ -310,15 +326,21 @@ export class Battery {
       await this.sleep(500);
     }
     this.pushBackIntoHeap();
+    stopTravel("full");
+    this.distanceTravelled = 0;
     //console.log("heaplenght" + this.cellHeap.heap.length)
   }
-
+  public cancelTravel(): void {
+    this.travelCancelled = true;
+  }
   public async charge2(
     numberOfCellsChargedAtATime: number,
     updateBatteryState: () => void,
+    stopCharge: () => void,
   ) {
+    this.chargeCancelled = false;
     this.calculateChargingBAC();
-    while (this.calculateStateOfCharge() != 100) {
+    while (!this.chargeCancelled && this.calculateStateOfCharge() != 100) {
       this.getChargingCells(numberOfCellsChargedAtATime);
       for (let i = 0; i < this.chargingCells1.length; i++) {
         var cell = this.chargingCells1[i];
@@ -350,14 +372,18 @@ export class Battery {
       updateBatteryState();
       await this.sleep(2000);
     }
+    if (!this.chargeCancelled) {
+      console.log(
+        "%cINFO: Charging complete for all cells.",
+        "color: green; font-weight: bold;",
+      );
+    }
     this.pushBackIntoHeap();
-    console.log(
-      "%cINFO: Charging complete for all cells.",
-      "color: green; font-weight: bold;",
-    );
     //console.log("heaplenght" + this.cellHeap.heap.length)
   }
-
+  public cancelCharge(): void {
+    this.chargeCancelled = true;
+  }
   private pushBackIntoHeap() {
     this.dischargingCells1.forEach((cell) => {
       cell.chargingStatus = "I";
