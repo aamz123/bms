@@ -106,12 +106,24 @@ export default function InputView({
     }
     setIsTravelling(false);
   };
-  const stopCharge = () => {
-    batteryInstance.cancelCharge(); // Set the flag to cancel charging
+  const stopCharge = (stopType: string) => {
+    if (stopType === "early") {
+      batteryInstance.cancelCharge(); // Set the flag to cancel charging
+      console.log(
+        `%cINFO: Charging stopped.`,
+        "color: red; font-weight: bold;",
+      );
+    }
+    if (stopType === "full") {
+      console.log(
+        "%cINFO: Charging complete for all cells.",
+        "color: green; font-weight: bold;",
+      );
+    }
+
     setSuperChargingOn(false);
     setOverNightChargingOn(false);
     setIsCharging(false);
-    console.log(`%cINFO: Charging stopped.`, "color: red; font-weight: bold;");
   };
   const handleStart = () => {
     if (isTravelling) {
@@ -300,7 +312,7 @@ export default function InputView({
 
                 <button
                   onClick={() => {
-                    stopCharge();
+                    stopCharge("early");
                   }}
                   className={`h-10 w-[240px] rounded-md px-4 py-2 transition duration-200 ${theme ? "bg-red-600 text-white hover:bg-red-700" : "bg-red-500 text-white hover:bg-red-600"}`}
                 >

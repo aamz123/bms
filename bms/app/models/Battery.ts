@@ -336,7 +336,7 @@ export class Battery {
   public async charge2(
     numberOfCellsChargedAtATime: number,
     updateBatteryState: () => void,
-    stopCharge: () => void,
+    stopCharge: (stopType: string) => void,
   ) {
     this.chargeCancelled = false;
     this.calculateChargingBAC();
@@ -372,13 +372,8 @@ export class Battery {
       updateBatteryState();
       await this.sleep(2000);
     }
-    if (!this.chargeCancelled) {
-      console.log(
-        "%cINFO: Charging complete for all cells.",
-        "color: green; font-weight: bold;",
-      );
-    }
     this.pushBackIntoHeap();
+    stopCharge("full");
     //console.log("heaplenght" + this.cellHeap.heap.length)
   }
   public cancelCharge(): void {
